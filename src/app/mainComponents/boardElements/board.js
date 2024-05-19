@@ -1,9 +1,25 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Cell from './cell';
+import KeyboardService from './services/KeyboardService';
 
 function Board() {
     const numRows = 10;
     const numCols = 20;
+    const [cellsOn, setCellsOn] = useState([]);
+    const [isObjectOnBoard, setIsObjectOnBoard] = useState(true);
+
+    useEffect(() => {
+        KeyboardService.init(handleSpacePress);
+        updateIsObjectOnBoard(cellsOn);
+    }, [cellsOn]);
+
+    const handleSpacePress = () => {
+        setCellsOn([[1, 1], [1, 2], [2, 1], [2, 2]]);
+    };
+
+    const updateIsObjectOnBoard = (cellsOn) => {
+        setIsObjectOnBoard(cellsOn.length === 0);
+    };
 
     // Generar las filas y columnas
     const rows = [];
@@ -20,7 +36,7 @@ function Board() {
             {rows.map((row, rowIndex) => (
                 <div key={rowIndex} className='flex flex-row'>
                     {row.map((cell, cellIndex) => (
-                        <Cell key={cellIndex} cellValue={cell} />
+                        <Cell key={cellIndex} cellValue={cell} cellsOn={cellsOn} />
                     ))}
                 </div>
             ))}

@@ -1,6 +1,14 @@
 import React, { useState, useEffect } from 'react';
 
-function Cell({ cellValue }) {
+function Cell({ cellValue, cellsOn }) {
+    const [isCellOn, setIsCellOn] = useState(false);
+
+    useEffect(() => {
+        // Verificar si cellValue coincide con algún elemento de cellsOn
+        const isCellOnNow = cellsOn.some(item => item[0] === cellValue.row && item[1] === cellValue.col);
+        setIsCellOn(isCellOnNow);
+    }, [cellValue, cellsOn]);
+
     const [isCellBottomLimit, setIsCellBottomLimit] = useState(false);
     const [isCellLeftLimit, setIsCellLeftLimit] = useState(false);
     const [isCellRightLimit, setIsCellRightLimit] = useState(false);
@@ -26,9 +34,8 @@ function Cell({ cellValue }) {
     }, [cellValue]);
 
     return (
-        <div className='flex flex-col text-center bg-black w-12 h-12  m-2'>
-            
-        </div>
+        <div className={`flex flex-col text-center ${isCellOn ? 'bg-orange-200' : 'bg-black'} w-12 h-12 m-2`}>
+         </div>
     );
 }
 
