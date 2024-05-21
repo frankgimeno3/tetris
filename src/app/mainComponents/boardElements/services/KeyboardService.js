@@ -1,7 +1,8 @@
 const KeyboardService = {
     handleArrowPress: null,
 
-    init: function(spaceCallback) {
+    init: function(arrowCallback, spaceCallback) {
+        this.handleArrowPress = arrowCallback;
         document.addEventListener('keydown', this.handleKeyDown);
         document.addEventListener('keydown', function(event) {
             if (event.key === ' ') {
