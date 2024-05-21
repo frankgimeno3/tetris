@@ -6,10 +6,12 @@ function Board() {
     const numRows = 10;
     const numCols = 20;
     const [cellsOn, setCellsOn] = useState([]);
+
     const [isObjectOnBoard, setIsObjectOnBoard] = useState(false);
     const [leftLimitReached, setLeftLimitReached] = useState(false);
     const [rightLimitReached, setRightLimitReached] = useState(false);
     const [bottomLimitReached, setBottomLimitReached] = useState(false);
+    const [topLimitReached, setTopLimitReached] = useState(false);
 
     const objectList = {
         dot: [[1, 1]],
@@ -25,9 +27,11 @@ function Board() {
 
     useEffect(() => {
         updateIsObjectOnBoard(cellsOn);
-    }, [cellsOn]);
+     }, [cellsOn]);
+
 
     const handleSpacePress = () => {
+        setIsObjectOnBoard(true)
         const objects = Object.values(objectList);
         const randomObject = objects[Math.floor(Math.random() * objects.length)];
         setCellsOn(randomObject);
@@ -35,36 +39,61 @@ function Board() {
 
     const handleArrowPress = (direction) => {
         setCellsOn(prevCellsOn => {
-            return prevCellsOn.map(([row, col]) => {
+            const nextCellsOn = prevCellsOn.map(([row, col]) => {
+                let newElement;
                 switch (direction) {
                     case 'left':
-                        return [row, Math.max(1, col - 1)];
+                        newElement = [row, Math.max(1, col - 1)];
+                        break;
                     case 'right':
-                        return [row, Math.min(20, col + 1)];
+                        newElement = [row, Math.min(20, col + 1)];
+                        break;
                     case 'up':
-                        return [Math.max(1, row - 1), col];
+                        newElement = [Math.max(1, row - 1), col];
+                        break;
                     case 'down':
-                        return [Math.min(10, row + 1)]; // Changed from 20 to 10 to match numRows
+                        newElement = [Math.min(10, row + 1), col];
+                        break;
                     default:
                         return [row, col];
                 }
+                return newElement;
             });
+    
+            // Check for duplicates in nextCellsOn
+            const isDuplicate = nextCellsOn.some((cell, index) => {
+                return (
+                    index !== nextCellsOn.findIndex(item => (
+                        item[0] === cell[0] && item[1] === cell[1]
+                    ))
+                );
+            });
+    
+            if (!isDuplicate) {
+                return nextCellsOn;
+            } else {
+                return prevCellsOn;
+            }
         });
     };
-
-    const updateIsObjectOnBoard = (cellsOn) => {
-        const isObjectOnBoard = cellsOn.length > 0;
-        setIsObjectOnBoard(isObjectOnBoard);
-
+    useEffect(() => {
         if (isObjectOnBoard) {
+            setTopLimitReached(cellsOn.some(([row, _]) => row === 1));
             setBottomLimitReached(cellsOn.some(([row, _]) => row === 10));
             setLeftLimitReached(cellsOn.some(([_, col]) => col === 1));
             setRightLimitReached(cellsOn.some(([_, col]) => col === 20));
+          
         } else {
+            setTopLimitReached(false);
             setBottomLimitReached(false);
             setLeftLimitReached(false);
             setRightLimitReached(false);
         }
+    }, [cellsOn]);
+
+    const updateIsObjectOnBoard = (cellsOn) => {
+        const isObjectOnBoard = cellsOn.length > 0;
+        setIsObjectOnBoard(isObjectOnBoard);
     };
 
     // Generar las filas y columnas
